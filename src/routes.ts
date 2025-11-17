@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { container } from './container';
 import { ResponseBuilder } from './utils/ResponseBuilder';
 import { HealthCheckResponse } from './types';
+import { authMiddleware } from './middleware/authMiddleware';
 
 const authService = container.getAuthService();
 const userService = container.getUserService();
@@ -13,6 +14,15 @@ const asyncHandler =
   (req: Request, res: Response, next: NextFunction): void => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
+
+router.get('/', (_req: Request, res: Response) => {
+  res.json(
+    ResponseBuilder.success(
+      { version: '1.0.0', message: 'Welcome to TypeScript REST API' },
+      'Welcome to REST API',
+    ),
+  );
+});
 
 router.post(
   '/auth/register',
@@ -39,13 +49,14 @@ router.get('/health', (_req: Request, res: Response) => {
   res.json(ResponseBuilder.success(healthResponse));
 });
 
-router.get('/users', (_req: Request, res: Response) => {
+router.get('/users', authMiddleware, (_req: Request, res: Response) => {
   const users = userService.getAllUsers();
   res.json(ResponseBuilder.success(users, `Retrieved ${users.length} users`));
 });
 
 router.get(
   '/users/:id',
+  authMiddleware,
   asyncHandler(async (req: Request, res: Response) => {
     const user = userService.getUserById(req.params.id);
     res.json(ResponseBuilder.success(user));
@@ -54,6 +65,7 @@ router.get(
 
 router.post(
   '/users',
+  authMiddleware,
   asyncHandler(async (req: Request, res: Response) => {
     const user = userService.createUser(req.body);
     res.status(201).json(ResponseBuilder.success(user, 'User created successfully'));
@@ -62,6 +74,7 @@ router.post(
 
 router.put(
   '/users/:id',
+  authMiddleware,
   asyncHandler(async (req: Request, res: Response) => {
     const user = userService.updateUser(req.params.id, req.body);
     res.json(ResponseBuilder.success(user, 'User updated successfully'));
@@ -70,9 +83,10 @@ router.put(
 
 router.delete(
   '/users/:id',
+  authMiddleware,
   asyncHandler(async (req: Request, res: Response) => {
     userService.deleteUser(req.params.id);
-    res.json(ResponseBuilder.success(null, 'User deleted successfully'));
+    res.status(204).send();
   }),
 );
 
