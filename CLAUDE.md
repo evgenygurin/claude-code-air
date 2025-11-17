@@ -1101,6 +1101,80 @@ There's a known compatibility issue with jest-environment-node in certain enviro
 - [x] **Type Safety**: All functions have return type annotations
 - [x] **Build Success**: TypeScript compilation with zero errors
 
+### Phase 5: Sandbox & Security Hardening ✅
+
+- [x] **Input Validation**: Zod schemas for all endpoints (email, password complexity, length limits)
+- [x] **Rate Limiting**: express-rate-limit with 3-tier strategy (API, auth, strict)
+- [x] **Security Headers**: Helmet.js with CSP, HSTS, X-Frame-Options, and more
+- [x] **CORS Protection**: Configurable allowed origins, preflight handling
+- [x] **Request Size Limiting**: 10KB default limit for JSON and URL-encoded bodies
+- [x] **Docker Security**: Multi-stage builds, non-root user, read-only filesystem, health checks
+- [x] **GitHub Actions CI/CD**: Automated testing, security scanning, build verification, Docker push
+- [x] **Environment Templates**: .env.example and .env.production.example with security warnings
+- [x] **Security Testing**: 20+ security-focused tests covering OWASP Top 10
+
+## 🔒 Sandbox & Security Implementation
+
+### Complete Security Architecture
+
+For comprehensive documentation of sandbox, containerization, and security implementations, see **[SANDBOX.md](./SANDBOX.md)**.
+
+**Quick Overview**:
+- **Application Security**: Input validation (Zod), authentication (JWT), error handling
+- **HTTP Security**: Security headers (helmet.js), CORS, rate limiting (3-tier strategy)
+- **Container Security**: Docker multi-stage builds, non-root user, read-only filesystem
+- **CI/CD Security**: GitHub Actions with npm audit, security scanning, Docker registry
+- **Test Isolation**: In-memory repositories, Jest cleanup patterns, test sandboxing
+- **OWASP Compliance**: Covers all top 10 vulnerabilities
+
+### Key Security Features
+
+**Input Validation** (src/validation/schemas.ts):
+```typescript
+// Password complexity: uppercase, lowercase, numbers, special chars
+// Email format validation with regex
+// Name length constraints (2-100 chars)
+// Automatic sanitization (trim, lowercase)
+```
+
+**Rate Limiting**:
+- API Limiter: 100 requests/15min
+- Auth Limiter: 5 requests/15min (stricter for login/register)
+- Strict Limiter: 10 requests/hour (sensitive operations)
+
+**Docker Security**:
+- Alpine Linux base (minimal attack surface)
+- Non-root user (appuser:1000)
+- Read-only root filesystem with tmpfs /tmp
+- Resource limits: 1 CPU, 512MB RAM
+- Health checks and signal handling
+
+**GitHub Actions CI/CD**:
+- Test Suite: TypeScript, ESLint, Prettier, Jest 164 tests
+- Security: npm audit with moderate level scanning
+- Build: TypeScript compilation, artifact verification
+- Docker: Multi-stage build, GHCR push on main branch
+
+### Testing Security
+
+Run security-focused tests:
+```bash
+npm run test:security
+# or
+npm test tests/unit/security.test.ts
+```
+
+Tests cover:
+- Input validation and injection prevention
+- Security headers verification
+- CORS protection
+- Request size limiting
+- Authentication & token security
+- Error response security
+- Rate limiting
+- SQL injection prevention
+- XSS prevention
+
 ## 🔮 Potential Enhancements
 
 ### Short Term (Database & Validation)

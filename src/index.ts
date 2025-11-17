@@ -4,12 +4,33 @@ import { router } from './routes';
 import { logger } from './middleware/logger';
 import { setupErrorHandler } from './middleware/errorHandler';
 import { ResponseBuilder } from './utils/ResponseBuilder';
+import {
+  helmetConfig,
+  corsMiddleware,
+  customSecurityHeaders,
+  hstsMiddleware,
+  clickjackProtection,
+} from './middleware/securityHeaders';
+import { apiLimiter } from './middleware/rateLimitMiddleware';
 
 const app: Express = express();
 const { port } = config.app;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security middleware - should be before routes
+app.use(helmetConfig);
+app.use(customSecurityHeaders);
+app.use(hstsMiddleware);
+app.use(clickjackProtection);
+app.use(corsMiddleware);
+
+// Body parsing middleware
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Rate limiting - apply to all API routes
+app.use('/api', apiLimiter);
+
+// Request logging
 app.use(logger);
 
 app.get('/', (_req, res) => {
