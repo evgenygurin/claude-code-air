@@ -1,85 +1,59 @@
-/**
- * Express Server Entry Point
- */
-
 import express, { Express } from 'express';
+import { config } from './config';
 import { router } from './routes';
+import { logger } from './middleware/logger';
+import { setupErrorHandler } from './middleware/errorHandler';
+import { ResponseBuilder } from './utils/ResponseBuilder';
 
 const app: Express = express();
-const PORT = process.env.PORT || 3000;
+const { port } = config.app;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(logger);
 
-// Request logging middleware
-app.use((req, _res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
+app.get('/', (_req, res) => {
+  res.json(
+    ResponseBuilder.success({
+      message: 'Welcome to TypeScript REST API',
+      version: '1.0.0',
+      endpoints: {
+        auth: {
+          register: 'POST /api/auth/register',
+          login: 'POST /api/auth/login',
+        },
+        health: 'GET /api/health',
+        users: {
+          list: 'GET /api/users',
+          get: 'GET /api/users/:id',
+          create: 'POST /api/users',
+          update: 'PUT /api/users/:id',
+          delete: 'DELETE /api/users/:id',
+        },
+      },
+    }),
+  );
 });
 
-// API routes
 app.use('/api', router);
 
-// Root endpoint
-app.get('/', (_req, res) => {
-  res.json({
-    message: 'Welcome to TypeScript REST API',
-    version: '1.0.0',
-    endpoints: {
-      auth: {
-        register: 'POST /api/auth/register',
-        login: 'POST /api/auth/login',
-      },
-      health: 'GET /api/health',
-      users: {
-        list: 'GET /api/users',
-        get: 'GET /api/users/:id',
-        create: 'POST /api/users',
-        update: 'PUT /api/users/:id',
-        delete: 'DELETE /api/users/:id',
-      },
-    },
-  });
-});
-
-// 404 handler
 app.use((_req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Not Found',
-  });
+  res.status(404).json(ResponseBuilder.error('Not Found'));
 });
 
-// Error handler
-app.use(
-  (
-    err: Error,
-    _req: express.Request,
-    res: express.Response,
-    _next: express.NextFunction,
-  ) => {
-    console.error('Error:', err);
-    res.status(500).json({
-      success: false,
-      error: err.message || 'Internal Server Error',
-    });
-  },
-);
+setupErrorHandler(app);
 
-// Start server only when run directly (not when imported for testing)
 if (require.main === module) {
-  const server = app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
+  const server = app.listen(port, () => {
+    console.log(`✅ Server running on http://localhost:${port}`);
     console.log(`📚 API Documentation:`);
-    console.log(`   GET  http://localhost:${PORT}/api/health`);
-    console.log(`   GET  http://localhost:${PORT}/api/users`);
-    console.log(`   POST http://localhost:${PORT}/api/users`);
-    console.log(`   POST http://localhost:${PORT}/api/auth/register`);
-    console.log(`   POST http://localhost:${PORT}/api/auth/login`);
+    console.log(`   GET  http://localhost:${port}/api/health`);
+    console.log(`   GET  http://localhost:${port}/api/users`);
+    console.log(`   POST http://localhost:${port}/api/users`);
+    console.log(`   POST http://localhost:${port}/api/auth/register`);
+    console.log(`   POST http://localhost:${port}/api/auth/login`);
   });
 
-  // Graceful shutdown
   process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully...');
     server.close(() => {
