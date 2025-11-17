@@ -6,14 +6,15 @@ A modern, production-ready REST API built with TypeScript, Express.js, Jest, and
 
 This is a full-featured REST API template demonstrating:
 - Express.js with TypeScript strict mode
-- Complete CRUD operations for users
-- Health check endpoint
-- Comprehensive test coverage with Jest
+- JWT authentication with bcrypt password hashing
+- Complete CRUD operations for users with role-based protection
+- Health check endpoint and monitoring
+- Comprehensive test coverage with Jest (50+ test cases)
 - Code quality tools (ESLint, Prettier)
 - Production-ready Docker build support
-- Health checks and monitoring endpoints
+- Protected endpoints requiring valid JWT tokens
 
-**Tech Stack**: Node.js, TypeScript 5, Express.js 4, Jest 28, ts-jest
+**Tech Stack**: Node.js, TypeScript 5, Express.js 4, JWT (jsonwebtoken), bcrypt, Jest 28, ts-jest
 
 ## 🛠️ Development Commands
 
@@ -125,12 +126,23 @@ package.json          # Dependencies and scripts
 
 ## 🔌 API Endpoints
 
-### Health & Info
+### Public Endpoints (No Auth Required)
 
 - `GET /` - Welcome message with version
 - `GET /api/health` - Health check (status, timestamp, uptime)
+- `POST /api/auth/register` - Register new user
+  - Body: `{ "email": "string", "password": "string (min 6 chars)" }`
+  - Response: `{ "success": true, "message": "..." }`
+- `POST /api/auth/login` - Authenticate and get tokens
+  - Body: `{ "email": "string", "password": "string" }`
+  - Response: `{ "success": true, "data": { "token": "JWT", "refreshToken": "JWT" } }`
+- `POST /api/auth/refresh` - Refresh expired access token
+  - Body: `{ "refreshToken": "string" }`
+  - Response: `{ "success": true, "data": { "token": "JWT" } }`
 
-### Users (CRUD)
+### Protected Endpoints (Require JWT Token)
+
+All user endpoints require `Authorization: Bearer <token>` header
 
 - `GET /api/users` - Get all users
 - `GET /api/users/:id` - Get user by ID
@@ -165,11 +177,13 @@ Error responses:
 
 The project includes comprehensive tests:
 
-- **40+ test cases** covering all endpoints
+- **50+ test cases** covering all endpoints
+- **Authentication tests** (registration, login, token refresh)
+- **Protected endpoints tests** (JWT validation, 401/403 errors)
 - **Integration tests** with full user lifecycle
-- **Error handling** validation
-- **Input validation** tests
-- **Unit tests** for controllers
+- **Error handling** validation (400, 401, 404, 500)
+- **Input validation** tests (missing fields, weak passwords)
+- **Unit tests** for controllers and auth module
 - **Jest + Supertest** for HTTP testing
 
 Run tests with coverage:
@@ -179,6 +193,72 @@ make test
 ```
 
 Check coverage reports in `coverage/` directory.
+
+## 🔐 Authentication System
+
+### JWT Authentication Flow
+
+1. **Register**: User creates account with email and password
+   ```bash
+   POST /api/auth/register
+   ```
+
+2. **Login**: User authenticates with credentials
+   ```bash
+   POST /api/auth/login
+   ```
+   - Returns `token` (access token, expires in 24h)
+   - Returns `refreshToken` (refresh token, expires in 7d)
+
+3. **Protected Requests**: Include token in Authorization header
+   ```bash
+   Authorization: Bearer <token>
+   ```
+
+4. **Token Refresh**: Request new access token before expiry
+   ```bash
+   POST /api/auth/refresh
+   ```
+
+### Password Security
+
+- Passwords are hashed with **bcrypt** (10 rounds)
+- Minimum 6 characters required
+- Passwords never stored in plaintext
+- Password comparison uses constant-time comparison
+
+### JWT Tokens
+
+- **Access Token**: Expires in 24 hours
+- **Refresh Token**: Expires in 7 days (type: 'refresh')
+- Signed with HS256 algorithm
+- Payload includes email and expiration time
+
+### Middleware Protection
+
+The `authMiddleware` validates:
+- Authorization header presence
+- Bearer token format
+- Token validity and expiration
+- Token signature verification
+
+Unprotected endpoints:
+- `GET /api/health` - Health check
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/refresh` - Token refresh
+
+Protected endpoints require valid JWT token in Authorization header.
+
+### Security Notes
+
+- 🔒 Passwords are never returned in API responses
+- 🔒 Token secret should be set via `JWT_SECRET` environment variable
+- 🔒 Refresh tokens should be stored securely on client (httpOnly cookie recommended)
+- 🔒 Access tokens should have short expiry (24h)
+- 🔒 Implement token rotation in production
+- 🔒 Add rate limiting to prevent brute force attacks
+- 🔒 Use HTTPS in production (never HTTP)
 
 ## 🎯 Development Workflow
 
