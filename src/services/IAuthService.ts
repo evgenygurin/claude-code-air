@@ -1,4 +1,9 @@
-import { AuthResponse, RegisterRequest, LoginRequest, TokenPayload } from '../types';
+import {
+  AuthResponse,
+  RegisterRequest,
+  LoginRequest,
+  TokenPayload,
+} from '../types';
 
 export interface IAuthService {
   register(request: RegisterRequest): Promise<AuthResponse>;

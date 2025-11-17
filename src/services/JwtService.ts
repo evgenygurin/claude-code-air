@@ -32,7 +32,10 @@ export class JwtService implements IJwtService {
 
   verifyRefreshToken(token: string): TokenPayload {
     try {
-      const decoded = jwt.verify(token, this.config.refreshSecret) as DecodedToken;
+      const decoded = jwt.verify(
+        token,
+        this.config.refreshSecret,
+      ) as DecodedToken;
       return { userId: decoded.userId, email: decoded.email };
     } catch {
       throw new AuthenticationError('Invalid refresh token');

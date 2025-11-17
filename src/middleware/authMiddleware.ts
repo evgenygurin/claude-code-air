@@ -28,7 +28,10 @@ export function authMiddleware(
 
     next();
   } catch (error) {
-    if (error instanceof ValidationError || error instanceof AuthenticationError) {
+    if (
+      error instanceof ValidationError ||
+      error instanceof AuthenticationError
+    ) {
       res
         .status(error.statusCode)
         .json({ success: false, error: error.message });

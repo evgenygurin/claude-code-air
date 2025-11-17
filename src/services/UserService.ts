@@ -1,4 +1,9 @@
-import { User, UserPublic, CreateUserRequest, UpdateUserRequest } from '../types';
+import {
+  User,
+  UserPublic,
+  CreateUserRequest,
+  UpdateUserRequest,
+} from '../types';
 import { IUserService } from './IUserService';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IdGenerator } from '../utils/IdGenerator';

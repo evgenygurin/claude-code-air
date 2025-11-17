@@ -1,4 +1,10 @@
-import { User, AuthResponse, RegisterRequest, LoginRequest, TokenPayload } from '../types';
+import {
+  User,
+  AuthResponse,
+  RegisterRequest,
+  LoginRequest,
+  TokenPayload,
+} from '../types';
 import { IAuthService } from './IAuthService';
 import { IJwtService } from './IJwtService';
 import { IPasswordService } from './IPasswordService';
@@ -43,7 +49,10 @@ export class AuthService implements IAuthService {
       throw new AuthenticationError('Invalid email or password');
     }
 
-    const isPasswordValid = await this.passwordService.compare(request.password, user.password);
+    const isPasswordValid = await this.passwordService.compare(
+      request.password,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new AuthenticationError('Invalid email or password');
     }
@@ -90,7 +99,9 @@ export class AuthService implements IAuthService {
 
   private validateRegisterRequest(request: RegisterRequest): void {
     if (!request.name || !request.email || !request.password) {
-      throw new ValidationError('Missing required fields: name, email, password');
+      throw new ValidationError(
+        'Missing required fields: name, email, password',
+      );
     }
   }
 
