@@ -2,7 +2,20 @@
  * Controller functions for business logic
  */
 
-import { User, CreateUserRequest, UpdateUserRequest } from './types';
+import {
+  User,
+  CreateUserRequest,
+  UpdateUserRequest,
+  RegisterRequest,
+  LoginRequest,
+  AuthResponse,
+} from './types';
+import {
+  hashPassword,
+  comparePassword,
+  generateToken,
+  generateRefreshToken,
+} from './auth';
 
 // In-memory database for demo purposes
 const users: Map<string, User> = new Map();
@@ -79,4 +92,85 @@ export function deleteUser(id: string): boolean {
  */
 export function userExists(id: string): boolean {
   return users.has(id);
+}
+
+/**
+ * Find user by email
+ */
+export function getUserByEmail(email: string): User | undefined {
+  for (const user of users.values()) {
+    if (user.email === email) {
+      return user;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Register new user with authentication
+ */
+export async function registerUser(
+  data: RegisterRequest,
+): Promise<AuthResponse> {
+  const existingUser = getUserByEmail(data.email);
+  if (existingUser) {
+    throw new Error('Email already registered');
+  }
+
+  const id = generateId();
+  const hashedPassword = await hashPassword(data.password);
+
+  const user: User = {
+    id,
+    name: data.name,
+    email: data.email,
+    password: hashedPassword,
+    createdAt: new Date(),
+  };
+
+  users.set(id, user);
+
+  const { token } = generateToken(id, data.email);
+  const { refreshToken } = generateRefreshToken(id, data.email);
+
+  return {
+    token,
+    refreshToken,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+  };
+}
+
+/**
+ * Login user and return tokens
+ */
+export async function loginUser(
+  data: LoginRequest,
+): Promise<AuthResponse> {
+  const user = getUserByEmail(data.email);
+
+  if (!user || !user.password) {
+    throw new Error('Invalid email or password');
+  }
+
+  const passwordMatch = await comparePassword(data.password, user.password);
+  if (!passwordMatch) {
+    throw new Error('Invalid email or password');
+  }
+
+  const { token } = generateToken(user.id, user.email);
+  const { refreshToken } = generateRefreshToken(user.id, user.email);
+
+  return {
+    token,
+    refreshToken,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+  };
 }

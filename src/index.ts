@@ -27,8 +27,18 @@ app.get('/', (_req, res) => {
     message: 'Welcome to TypeScript REST API',
     version: '1.0.0',
     endpoints: {
-      health: '/api/health',
-      users: '/api/users',
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+      },
+      health: 'GET /api/health',
+      users: {
+        list: 'GET /api/users',
+        get: 'GET /api/users/:id',
+        create: 'POST /api/users',
+        update: 'PUT /api/users/:id',
+        delete: 'DELETE /api/users/:id',
+      },
     },
   });
 });
@@ -57,30 +67,34 @@ app.use(
   },
 );
 
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`📚 API Documentation:`);
-  console.log(`   GET  http://localhost:${PORT}/api/health`);
-  console.log(`   GET  http://localhost:${PORT}/api/users`);
-  console.log(`   POST http://localhost:${PORT}/api/users`);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
+// Start server only when run directly (not when imported for testing)
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`📚 API Documentation:`);
+    console.log(`   GET  http://localhost:${PORT}/api/health`);
+    console.log(`   GET  http://localhost:${PORT}/api/users`);
+    console.log(`   POST http://localhost:${PORT}/api/users`);
+    console.log(`   POST http://localhost:${PORT}/api/auth/register`);
+    console.log(`   POST http://localhost:${PORT}/api/auth/login`);
   });
-});
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully...');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
   });
-});
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully...');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+}
 
 export default app;

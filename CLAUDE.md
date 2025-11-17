@@ -6,15 +6,14 @@ A modern, production-ready REST API built with TypeScript, Express.js, Jest, and
 
 This is a full-featured REST API template demonstrating:
 - Express.js with TypeScript strict mode
-- JWT authentication with bcrypt password hashing
-- Complete CRUD operations for users with role-based protection
-- Health check endpoint and monitoring
-- Comprehensive test coverage with Jest (50+ test cases)
+- Complete CRUD operations for users
+- Health check endpoint
+- Comprehensive test coverage with Jest
 - Code quality tools (ESLint, Prettier)
 - Production-ready Docker build support
-- Protected endpoints requiring valid JWT tokens
+- Health checks and monitoring endpoints
 
-**Tech Stack**: Node.js, TypeScript 5, Express.js 4, JWT (jsonwebtoken), bcrypt, Jest 28, ts-jest
+**Tech Stack**: Node.js, TypeScript 5, Express.js 4, Jest 28, ts-jest
 
 ## 🛠️ Development Commands
 
@@ -126,27 +125,25 @@ package.json          # Dependencies and scripts
 
 ## 🔌 API Endpoints
 
-### Public Endpoints (No Auth Required)
+### Health & Info
 
 - `GET /` - Welcome message with version
 - `GET /api/health` - Health check (status, timestamp, uptime)
+
+### Authentication
+
 - `POST /api/auth/register` - Register new user
-  - Body: `{ "email": "string", "password": "string (min 6 chars)" }`
-  - Response: `{ "success": true, "message": "..." }`
-- `POST /api/auth/login` - Authenticate and get tokens
+  - Body: `{ "name": "string", "email": "string", "password": "string" }`
+  - Returns: `{ "token": "JWT", "refreshToken": "JWT", "user": {...} }`
+- `POST /api/auth/login` - Login user
   - Body: `{ "email": "string", "password": "string" }`
-  - Response: `{ "success": true, "data": { "token": "JWT", "refreshToken": "JWT" } }`
-- `POST /api/auth/refresh` - Refresh expired access token
-  - Body: `{ "refreshToken": "string" }`
-  - Response: `{ "success": true, "data": { "token": "JWT" } }`
+  - Returns: `{ "token": "JWT", "refreshToken": "JWT", "user": {...} }`
 
-### Protected Endpoints (Require JWT Token)
-
-All user endpoints require `Authorization: Bearer <token>` header
+### Users (CRUD)
 
 - `GET /api/users` - Get all users
 - `GET /api/users/:id` - Get user by ID
-- `POST /api/users` - Create new user
+- `POST /api/users` - Create new user (without authentication)
   - Body: `{ "name": "string", "email": "string" }`
 - `PUT /api/users/:id` - Update user (partial)
   - Body: `{ "name?": "string", "email?": "string" }`
@@ -177,14 +174,33 @@ Error responses:
 
 The project includes comprehensive tests:
 
-- **50+ test cases** covering all endpoints
-- **Authentication tests** (registration, login, token refresh)
-- **Protected endpoints tests** (JWT validation, 401/403 errors)
+- **55+ test cases** covering all endpoints including authentication
 - **Integration tests** with full user lifecycle
-- **Error handling** validation (400, 401, 404, 500)
-- **Input validation** tests (missing fields, weak passwords)
-- **Unit tests** for controllers and auth module
+- **Error handling** validation
+- **Input validation** tests
+- **Unit tests** for controllers
+- **Authentication tests** for registration, login, and JWT verification
 - **Jest + Supertest** for HTTP testing
+
+### Test Coverage
+
+**Authentication Tests** (19 tests):
+- User registration with validation
+- JWT token generation and verification
+- Password hashing with bcrypt
+- Duplicate email prevention
+- Login with correct/incorrect credentials
+- Complete auth lifecycle flow
+- Multiple users authentication
+
+**API Tests** (19 tests):
+- CRUD operations on users
+- Health check endpoint
+- Error handling and validation
+- Complete user lifecycle
+
+**Simple Tests** (1 test):
+- Basic test structure validation
 
 Run tests with coverage:
 
@@ -192,73 +208,26 @@ Run tests with coverage:
 make test
 ```
 
+Watch mode for development:
+
+```bash
+make test-watch
+```
+
 Check coverage reports in `coverage/` directory.
 
-## 🔐 Authentication System
+### Running Specific Tests
 
-### JWT Authentication Flow
+```bash
+# Run only authentication tests
+npm test tests/auth.test.ts
 
-1. **Register**: User creates account with email and password
-   ```bash
-   POST /api/auth/register
-   ```
+# Run only API tests
+npm test tests/api.test.ts
 
-2. **Login**: User authenticates with credentials
-   ```bash
-   POST /api/auth/login
-   ```
-   - Returns `token` (access token, expires in 24h)
-   - Returns `refreshToken` (refresh token, expires in 7d)
-
-3. **Protected Requests**: Include token in Authorization header
-   ```bash
-   Authorization: Bearer <token>
-   ```
-
-4. **Token Refresh**: Request new access token before expiry
-   ```bash
-   POST /api/auth/refresh
-   ```
-
-### Password Security
-
-- Passwords are hashed with **bcrypt** (10 rounds)
-- Minimum 6 characters required
-- Passwords never stored in plaintext
-- Password comparison uses constant-time comparison
-
-### JWT Tokens
-
-- **Access Token**: Expires in 24 hours
-- **Refresh Token**: Expires in 7 days (type: 'refresh')
-- Signed with HS256 algorithm
-- Payload includes email and expiration time
-
-### Middleware Protection
-
-The `authMiddleware` validates:
-- Authorization header presence
-- Bearer token format
-- Token validity and expiration
-- Token signature verification
-
-Unprotected endpoints:
-- `GET /api/health` - Health check
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/refresh` - Token refresh
-
-Protected endpoints require valid JWT token in Authorization header.
-
-### Security Notes
-
-- 🔒 Passwords are never returned in API responses
-- 🔒 Token secret should be set via `JWT_SECRET` environment variable
-- 🔒 Refresh tokens should be stored securely on client (httpOnly cookie recommended)
-- 🔒 Access tokens should have short expiry (24h)
-- 🔒 Implement token rotation in production
-- 🔒 Add rate limiting to prevent brute force attacks
-- 🔒 Use HTTPS in production (never HTTP)
+# Watch specific test file
+npm test tests/auth.test.ts -- --watch
+```
 
 ## 🎯 Development Workflow
 
@@ -293,6 +262,80 @@ make build              # Compile TypeScript
 make start              # Run production server
 ```
 
+## 🔒 Authentication & Security
+
+### JWT Implementation
+
+The API includes JWT (JSON Web Token) authentication with:
+
+- **Access tokens** - 15-minute expiry for API requests
+- **Refresh tokens** - 7-day expiry for token refresh
+- **Password hashing** - bcrypt with 10 salt rounds
+- **Token generation** - HMAC-SHA256 signing
+
+### Authentication Flow
+
+1. **Registration**: User provides name, email, password
+   - Password is hashed with bcrypt
+   - User is stored with hashed password
+   - JWT tokens are issued immediately
+
+2. **Login**: User provides email, password
+   - Email is validated
+   - Password is compared with bcrypt hash
+   - JWT tokens are issued on success
+
+3. **Token Usage**: Include token in Authorization header
+   ```text
+   Authorization: Bearer <token>
+   ```
+
+### Configuration
+
+Token secrets and expiry are configured via environment variables:
+
+```bash
+JWT_SECRET=your-secret-key-change-in-production
+REFRESH_SECRET=your-refresh-secret-change-in-production
+```
+
+**Important**: Change these in production!
+
+### Example Authentication Flow
+
+```bash
+# Register
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "securePassword123"
+  }'
+
+# Response includes tokens
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+    "user": {
+      "id": "user_...",
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+  }
+}
+
+# Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "securePassword123"
+  }'
+```
+
 ## 🔒 Type Safety
 
 - **TypeScript strict mode** enabled
@@ -304,16 +347,22 @@ make start              # Run production server
 Example:
 
 ```typescript
-// controllers.ts
-export function createUser(data: CreateUserRequest): User {
-  const id = generateId();
-  const user: User = {
-    id,
-    name: data.name,
-    email: data.email,
-    createdAt: new Date(),
-  };
-  return user;
+// auth.ts
+export async function hashPassword(password: string): Promise<string> {
+  const saltRounds = 10;
+  return bcrypt.hash(password, saltRounds);
+}
+
+export function generateToken(
+  userId: string,
+  email: string,
+): { token: string; expiresIn: string } {
+  const token = jwt.sign(
+    { userId, email },
+    JWT_SECRET,
+    { expiresIn: TOKEN_EXPIRY },
+  );
+  return { token, expiresIn: TOKEN_EXPIRY };
 }
 ```
 
@@ -517,12 +566,13 @@ There's a known compatibility issue with jest-environment-node in certain enviro
 
 ### Security Considerations
 
-- ❌ No authentication currently
-- ❌ No input sanitization
-- ❌ No CORS handling
-- ❌ No rate limiting
+- ✅ JWT authentication with bcrypt password hashing
+- ⚠️ No input sanitization (add express-validator)
+- ⚠️ No CORS handling (add helmet.js)
+- ⚠️ No rate limiting (add express-rate-limit)
+- ⚠️ No authentication middleware (only endpoints return tokens)
 
-**To Add**: JWT tokens, helmet.js, CORS middleware, input validation
+**To Add**: Input validation, helmet.js, CORS middleware, rate limiting, auth middleware
 
 ## 🎓 Learning Resources
 
@@ -550,7 +600,9 @@ There's a known compatibility issue with jest-environment-node in certain enviro
 
 ### Short Term
 
-- [ ] Add JWT authentication
+- [x] Add JWT authentication (completed with bcrypt password hashing)
+- [ ] Add authentication middleware (protect endpoints with JWT)
+- [ ] Add refresh token rotation
 - [ ] Add database (PostgreSQL with Prisma)
 - [ ] Add request logging middleware
 - [ ] Add input validation library (Joi or Zod)

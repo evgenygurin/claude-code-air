@@ -7,8 +7,6 @@ import app from '../src/index';
 import {
   getAllUsers,
   createUser,
-  getUserById,
-  updateUser,
   deleteUser,
 } from '../src/controllers';
 
