@@ -1,5 +1,7 @@
 # Claude on 3rd-Party Platforms - Complete Learning Guide
 
+⚠️ **Note**: This guide covers Claude API integration with AWS Bedrock and Google Vertex AI platforms. For primary REST API documentation, see [CLAUDE.md](./CLAUDE.md) and [README.md](./README.md).
+
 Comprehensive guide analyzing examples and best practices from the implementation.
 
 ## 📚 Table of Contents

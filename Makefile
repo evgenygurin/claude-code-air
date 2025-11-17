@@ -1,4 +1,4 @@
-.PHONY: help install dev build start test test-watch coverage lint lint-fix format format-check clean quality all
+.PHONY: help install dev build start test test-watch coverage lint lint-fix format format-check clean quality all type-check pre-commit docker-build docker-run docker-stop docker-logs debug debug-ts
 
 # Colors for output
 BOLD := \033[1m
@@ -166,6 +166,24 @@ version: ## Show versions of key tools
 	@npx jest --version
 
 .PHONY: version
+
+##@ Docker
+
+docker-build: ## Build Docker image
+	@echo "$(BLUE)🐳 Building Docker image...$(NC)"
+	docker build -t typescript-rest-api:latest .
+
+docker-run: ## Run containers with Docker Compose
+	@echo "$(BLUE)🐳 Starting Docker containers...$(NC)"
+	docker-compose up -d
+
+docker-stop: ## Stop Docker containers
+	@echo "$(BLUE)🛑 Stopping Docker containers...$(NC)"
+	docker-compose down
+
+docker-logs: ## View Docker container logs
+	@echo "$(BLUE)📋 Docker logs...$(NC)"
+	docker-compose logs -f api
 
 ##@ Debugging
 

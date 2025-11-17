@@ -10,3 +10,14 @@ coverage/
 *.swp
 *.swo
 *~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# OS
+Thumbs.db
+.DS_Store

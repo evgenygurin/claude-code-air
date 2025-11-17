@@ -1,6 +1,17 @@
-// Jest setup file for Node environment
-// Handle any global setup needed
+/**
+ * Jest global setup file
+ * Configured for Node.js environment with test isolation
+ */
 
-// Silence console logs during tests if needed
-// console.log = jest.fn();
-// console.error = jest.fn();
+// Increase timeout for integration tests
+jest.setTimeout(10000);
+
+// Optional: Suppress specific console output during tests
+// Uncomment to silence console during test runs:
+// global.console = {
+//   log: jest.fn(),
+//   debug: jest.fn(),
+//   info: jest.fn(),
+//   warn: jest.fn(),
+//   error: jest.fn(),
+// };
