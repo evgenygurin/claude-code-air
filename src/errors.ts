@@ -17,7 +17,7 @@ export class ValidationError extends AppError {
 }
 
 export class AuthenticationError extends AppError {
-  constructor(message: string = 'Authentication failed') {
+  constructor(message = 'Authentication failed') {
     super(message, 401, true);
     Object.setPrototypeOf(this, AuthenticationError.prototype);
   }
@@ -38,7 +38,7 @@ export class ConflictError extends AppError {
 }
 
 export class InternalServerError extends AppError {
-  constructor(message: string = 'Internal server error') {
+  constructor(message = 'Internal server error') {
     super(message, 500, false);
     Object.setPrototypeOf(this, InternalServerError.prototype);
   }
