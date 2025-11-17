@@ -153,9 +153,9 @@ make install         # Install dependencies
 ## Documentation
 
 - **[CLAUDE.md](./CLAUDE.md)** - Comprehensive architecture and development guide
-- **[SANDBOX.md](./SANDBOX.md)** - Security, containerization, and sandbox implementation
-- **[SANDBOX_SETUP_GUIDE.md](./SANDBOX_SETUP_GUIDE.md)** - Production deployment checklist
-- **[REFACTORING.md](./REFACTORING.md)** - Architecture refactoring history
+- **[SANDBOX.md](./docs/SANDBOX.md)** - Security, containerization, and sandbox implementation
+- **[SANDBOX_SETUP_GUIDE.md](./docs/SANDBOX_SETUP_GUIDE.md)** - Production deployment checklist
+- **[REFACTORING.md](./docs/REFACTORING.md)** - Architecture refactoring history
 
 ## Security Features
 
@@ -183,7 +183,7 @@ npm run docker:run
 npm run docker:stop
 ```
 
-See [SANDBOX_SETUP_GUIDE.md](./SANDBOX_SETUP_GUIDE.md) for detailed deployment instructions.
+See [SANDBOX_SETUP_GUIDE.md](./docs/SANDBOX_SETUP_GUIDE.md) for detailed deployment instructions.
 
 ## License
 
