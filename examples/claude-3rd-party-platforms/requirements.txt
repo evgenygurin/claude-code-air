@@ -1,0 +1,15 @@
+# Claude on 3rd-Party Platforms - Python Dependencies
+
+# AWS Bedrock
+anthropic[bedrock]>=0.28.0
+
+# Google Vertex AI
+google-cloud-aiplatform>=1.50.0
+anthropic[vertex]>=0.28.0
+
+# For interactive examples
+prompt-toolkit>=3.0.0
+
+# Optional: for TypeScript examples
+# typescript>=5.0.0
+# ts-node>=10.9.0
