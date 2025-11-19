@@ -15,8 +15,8 @@ WORKDIR /build
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with security audit
-RUN npm ci --only=production && npm audit --audit-level=moderate
+# Install all dependencies (including dev deps for TypeScript build)
+RUN npm ci && npm audit --audit-level=moderate
 
 # Copy source code
 COPY src ./src
@@ -24,6 +24,9 @@ COPY tsconfig.json ./
 
 # Build TypeScript
 RUN npm run build
+
+# Remove dev dependencies after build
+RUN npm prune --production
 
 # Stage 2: Runtime
 FROM node:20-alpine
