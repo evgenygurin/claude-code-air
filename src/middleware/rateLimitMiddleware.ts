@@ -62,8 +62,7 @@ export const authLimiter = rateLimit({
 export const strictLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10, // 10 requests per hour
-  message:
-    'Too many requests for this operation, please try again later.',
+  message: 'Too many requests for this operation, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: false,
@@ -81,7 +80,7 @@ export const strictLimiter = rateLimit({
  * Create size limiter middleware
  * Limits request payload size
  */
-export function createSizeLimiter(maxSize: string = '10kb') {
+export function createSizeLimiter(maxSize = '10kb') {
   return (_req: Request, res: Response, next: () => void) => {
     const contentLength = parseInt(_req.headers['content-length'] || '0', 10);
     const maxSizeBytes = parseSize(maxSize);
@@ -123,7 +122,7 @@ function parseSize(size: string): number {
  */
 const activeRequests = new Map<string, number>();
 
-export function concurrencyLimiter(maxConcurrent: number = 3) {
+export function concurrencyLimiter(maxConcurrent = 3) {
   return (req: Request, res: Response, next: () => void) => {
     const key =
       (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
