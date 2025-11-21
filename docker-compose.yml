@@ -11,11 +11,13 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
-      REFRESH_SECRET: ${REFRESH_SECRET:-change-me-in-production}
-      JWT_EXPIRY: 15m
-      REFRESH_EXPIRY: 7d
-      SALT_ROUNDS: 10
+      # JWT Secrets are REQUIRED for production - no defaults provided for security
+      # Set these environment variables before running: JWT_SECRET, REFRESH_SECRET
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET environment variable is required}
+      REFRESH_SECRET: ${REFRESH_SECRET:?REFRESH_SECRET environment variable is required}
+      JWT_EXPIRY: ${JWT_EXPIRY:-15m}
+      REFRESH_EXPIRY: ${REFRESH_EXPIRY:-7d}
+      SALT_ROUNDS: ${SALT_ROUNDS:-12}
     # Health check
     healthcheck:
       test:
