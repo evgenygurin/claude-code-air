@@ -1117,7 +1117,7 @@ There's a known compatibility issue with jest-environment-node in certain enviro
 
 ### Complete Security Architecture
 
-For comprehensive documentation of sandbox, containerization, and security implementations, see **[SANDBOX.md](./SANDBOX.md)**.
+For comprehensive documentation of sandbox, containerization, and security implementations, see **[SANDBOX.md](./docs/SANDBOX.md)**.
 
 **Quick Overview**:
 - **Application Security**: Input validation (Zod), authentication (JWT), error handling

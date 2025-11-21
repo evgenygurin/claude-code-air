@@ -1,23 +1,121 @@
+# Dependencies & Packages
 node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp
+.pnp.js
+
+# Build & Distribution
 dist/
-*.log
-.DS_Store
+build/
+out/
+.next/
+.nuxt/
+.cache/
+
+# Environment & Secrets
 .env
 .env.local
+.env.*.local
+.env.production.local
+.env.vault
+.vlt
+
+# Testing & Coverage
 coverage/
+.coverage
+.nyc_output/
+.pytest_cache/
+.mocha_output/
+jest-results.json
+*.lcov
+test-results.xml
+
+# Logs & Debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+debug.log
+.env.debug
+
+# IDE & Editor
 .vscode/
 .idea/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
 *.swp
 *.swo
 *~
+*.bak
+*.tmp
+*.temp
 
-# Python
+# Development Tools
+.eslintcache
+.stylelintcache
+.node-gyp/
+tsconfig.tsbuildinfo
+tsbuildinfo.json
+.eslint-stats.json
+
+# Python (for any scripts)
 __pycache__/
-*.pyc
-*.pyo
-*.egg-info/
+*.py[cod]
+*$py.class
 .pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+venv/
+env/
+ENV/
+.venv
 
-# OS
-Thumbs.db
+# Git
+.git/
+.gitattributes
+
+# OS Files
 .DS_Store
+.AppleDouble
+.LSOverride
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# IDE Remote Development
+.vscode-remote
+.devcontainer/
+
+# Chrome DevTools
+.chrome/
+
+# Memory dumps
+*.heapsnapshot
+core
+core.*
+
+# Misc
+.history
+.vlt/
+*.swn
+*.orig
+.gitkeep
+
+# Local Development Notes
+.LOCAL_NOTES.md
+.local-todo.txt
