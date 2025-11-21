@@ -52,7 +52,11 @@ export const helmetConfig = helmet({
  * Custom CORS middleware for API
  * Configurable by environment
  */
-export function corsMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function corsMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const allowedOrigins = getAllowedOrigins();
   const origin = req.headers.origin as string;
 
@@ -117,7 +121,10 @@ export function customSecurityHeaders(
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
   // Disable browser caching for sensitive data
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader(
+    'Cache-Control',
+    'no-store, no-cache, must-revalidate, proxy-revalidate',
+  );
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
 
@@ -147,7 +154,11 @@ export function customSecurityHeaders(
  * Strict transport security middleware
  * Ensures HTTPS communication
  */
-export function hstsMiddleware(_req: Request, res: Response, next: NextFunction): void {
+export function hstsMiddleware(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const env = process.env.NODE_ENV || 'development';
 
   // Only enforce in production
