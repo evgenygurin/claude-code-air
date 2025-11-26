@@ -14,7 +14,6 @@ LEARNING_GUIDE.md
 SECURITY.md
 .eslintrc.json
 .prettierrc
-tsconfig.json
 jest.config.js
 Makefile
 .vscode
