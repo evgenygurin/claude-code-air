@@ -1,29 +1,128 @@
-node_modules
-npm-debug.log
-coverage
-dist
-.git
-.gitignore
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build & Distribution
+dist/
+build/
+out/
+.next/
+
+# Testing & Coverage
+coverage/
+.coverage
+.pytest_cache/
+jest-results.json
+*.lcov
+
+# Environment & Secrets
 .env
 .env.local
 .env.*.local
+.env.production.local
+
+# Version Control
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (keep only essential)
 README.md
 CLAUDE.md
-REFACTORING.md
-LEARNING_GUIDE.md
-SECURITY.md
+LICENSE
+
+# Configuration Files (not needed in container)
 .eslintrc.json
 .prettierrc
 jest.config.js
+jest.setup.js
+jest-env.js
+.babelrc
+.mocharc.*
 Makefile
-.vscode
-.idea
+.editorconfig
+
+# Development Tools
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
+*.sublime-workspace
+*.sublime-project
 .DS_Store
-tests
-.github/workflows
+Thumbs.db
+
+# Development Files
+tests/
+examples/
+docs/
+.github/
+.gitlab-ci.yml
+.circleci/
+.travis.yml
+appveyor.yml
+
+# Docker Files (not needed in image)
 docker-compose.yml
-Dockerfile
+docker-compose.*.yml
+Dockerfile.dev
 .dockerignore
+
+# Logs
+npm-debug.log
+npm-debug.log.*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# OS & Editor Files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+*.bak
+*.tmp
+*.temp
+
+# Python (if any scripts included)
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Node.js specific
+.npm
+.npx
+.node-gyp
+npm-shrinkwrap.json
+
+# System
+.env.vault
+.vlt
+
+# IDE Generated Files
+.vscode-test/
+.nyc_output/
+.rpt2_cache/
+.cache/
+.turbo/
+.tsbuildinfo
+
+# Additional Development
+.vscode-remote/
+.devcontainer/
+.chrome/
+*.heapsnapshot
+core
+core.*
+
+# Project Specific Documentation
+PROJECT_AUDIT_REPORT.md
+REFACTORING.md
+docs/
