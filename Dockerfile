@@ -34,7 +34,8 @@ WORKDIR /app
 RUN apk add --no-cache dumb-init
 
 # Create non-root user for security
-RUN addgroup -g 1000 appuser && \
+# Handle case where GID 1000 might already exist
+RUN (addgroup -g 1000 appuser 2>/dev/null || addgroup appuser) && \
     adduser -D -u 1000 -G appuser appuser
 
 # Copy runtime dependencies
