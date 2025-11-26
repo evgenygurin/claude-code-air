@@ -15,8 +15,8 @@ WORKDIR /build
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with security audit
-RUN npm ci --only=production && npm audit --audit-level=moderate
+# Install all dependencies (including dev dependencies for TypeScript build)
+RUN npm ci && npm audit --audit-level=moderate
 
 # Copy source code
 COPY src ./src
@@ -38,10 +38,12 @@ RUN apk add --no-cache dumb-init
 RUN (addgroup -g 1000 appuser 2>/dev/null || addgroup appuser) && \
     (adduser -D -u 1000 -G appuser appuser 2>/dev/null || adduser -D -G appuser appuser)
 
-# Copy runtime dependencies
-COPY --from=builder /build/node_modules ./node_modules
+# Install only production dependencies for runtime
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy built application
 COPY --from=builder /build/dist ./dist
-COPY --from=builder /build/package*.json ./
 
 # Set permissions
 RUN chown -R appuser:appuser /app
