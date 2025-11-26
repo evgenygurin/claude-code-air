@@ -28,19 +28,28 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          echo "Dependencies installed successfully"
+          npm --version
+          node --version
 
       - name: Run linter
         run: npm run lint
+        continue-on-error: false
 
       - name: Check formatting
         run: npm run format:check
+        continue-on-error: false
 
       - name: Run type check
         run: npm run type-check
+        continue-on-error: false
 
       - name: Run tests with coverage
         run: npm test -- --coverage
+        timeout-minutes: 10
+        continue-on-error: false
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -67,10 +76,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          echo "Dependencies installed for security checks"
 
       - name: Run npm audit
         run: npm audit --audit-level=moderate
+        continue-on-error: false
 
       - name: Run security scan with npm audit
         continue-on-error: true
@@ -97,15 +109,20 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          echo "Dependencies installed for build"
 
       - name: Build TypeScript
         run: npm run build
+        timeout-minutes: 5
+        continue-on-error: false
 
       - name: Verify build artifacts
         run: |
           test -d dist && echo "Build successful - dist directory exists" || exit 1
           test -f dist/index.js && echo "Entry point exists" || exit 1
+        continue-on-error: false
 
   docker:
     name: Build Docker Image
@@ -153,3 +170,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+        timeout-minutes: 15
+        continue-on-error: false
